@@ -1,0 +1,314 @@
+\documentclass{beamer}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+% \theoremstyle{definition}
+% \newtheorem{definition}{Definition}
+
+% \theoremstyle{plain}
+% \newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\title{Week 4 CUSF State Feedback 1: Eigenvalue Assignment}
+\author{Yoonjae Hwang}
+\date{2 November 2025}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Motivation}
+\begin{equation}
+    \begin{aligned}
+        \dot{x} &= Ax + Bu \\
+        y &= Cx 
+    \end{aligned}
+\end{equation}
+\begin{itemize}
+    \item Previously, we only considered using the output to control our system
+    \item Instability may lie in a variable that we cannot measure directly
+    \item The next two weeks we will consider the controllers of the form: $u = - Kx$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Motivation}
+If $u = - Kx$, the system dynamics fundamentally change:
+\begin{equation}
+    \dot{x} = (A-BK)x
+\end{equation}
+
+
+\begin{itemize}
+    \item By changing $K$, we can alter the system dynamics
+    \item Handle Multiple Input Multiple Output systems (instead of cascade)
+    \item Influencing the each of the variables that determine the state
+    \item Question: How do we determine $K$?
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Some Linear Algebra}
+If $T \in \mathcal{L}(V,W)$, the \textsl{eigenvalues} of $T$ are defined as $\lambda \in \mathbb{C}$ such that: 
+\begin{equation}
+    T(v) = \lambda v
+\end{equation}
+
+The corresponding \textsl{eigenvectors} of $T$ for each $\lambda$ is $v$.
+If the linear map $T$ is represented by a matrix $A$, then the eigenvalues are s that satisfies:
+\begin{equation}
+    \det(sI - A) = 0
+\end{equation}
+The characteristic polynomial of $A$ is given by: 
+\begin{equation}
+    p(s) = det(sI - A) = s^n + c_1 s^{n-1} + \cdots + c_{n-1} s + c_n
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Cayley-Hamilton Theorem}
+If $p(s) = det(sI - A) = s^n + c_1 s^{n-1} + \cdots + c_{n-1} s + c_n$ is the characteristic polynomial 
+of $A$, then the corresponding matrix polynomial, $p(A) = 0$ ie:
+\begin{equation}
+    A^n + c_1 A^{n-1} + \cdots + c_{n-1} A + c_n I = 0
+\end{equation}
+
+Consequences: we can represent $A^n$ as:
+\begin{equation}
+    A^n = -c_n I - c_{n-1} A - \cdots - c_1 A^{n-1}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{The Matrix Exponential}
+The solution to the differential equation: 
+\begin{equation}
+    \dot{x} = Ax
+\end{equation}
+is given by: 
+\begin{equation}
+    x(t) = e^{At}x(0)
+\end{equation}
+$e^{At}$ is defined by the Taylor Series of the Exponential function:
+\begin{equation}
+    e^{At} = I + At + \frac{A^2t^2}{2!} + \cdots
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Reachability}
+What set of points in the state space can be reached through the choice of a control input?
+\begin{definition}[Reachability]
+A linear system is reachable if for any $x_0, x_f \in \mathbb{R^n}, \exists T>0$ and $u: [0,T] \to \mathbb{R} \text{ such that } x(0) = x_0 \implies x(T) = x_f$
+\end{definition}
+
+\begin{itemize}
+    \item Addresses whether it is possible to reach all points in the state space in a transiet fashion
+    \item We are most concerned about the set of equilibrium points of the system
+    \item $\mathcal{R}_{eq}= \{x_e: Ax_e + Bu_e = 0 \| u_e \in \mathbb{R}\}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Testing for Reachability}
+\begin{definition}
+The \textsl{reachability matrix} is given by: 
+\begin{equation}
+    W_r = 
+    \begin{bmatrix}
+        B & AB & \cdots & A^{n-1}B
+    \end{bmatrix}
+\end{equation}
+\end{definition}
+\begin{theorem}
+    For single input: a linear system is reachable if and only if the reachability matrix $W_r$ is full row rank.
+\end{theorem}
+You can look at the proof yourself.
+There are other tests for reachability one can look at as well.
+\end{frame}
+
+\begin{frame}
+\frametitle{Reachable Canonical Form}
+It is often convenient to change coordinates and write the dynamics of the system in transformed coordinates. 
+This way we can transform unfamiliar settings into systems that we can easily analyse. 
+We employ the coordinate transform $z=Tx$, to transform a system into its \textsl{reachable canonical form}. 
+You can generalise this notion to multiple inputs.
+\begin{equation}
+\begin{aligned}
+\frac{dz}{dt}
+&=
+\begin{pmatrix}
+-a_1 & -a_2 & -a_3 & \cdots & -a_n \\
+1 & 0 & 0 & \cdots & 0 \\
+0 & 1 & 0 & \cdots & 0 \\
+\vdots & & \ddots & \ddots & \vdots \\
+0 & 0 & \cdots & 1 & 0
+\end{pmatrix}
+z
++
+\begin{pmatrix}
+1 \\ 0 \\ 0 \\ \vdots \\ 0
+\end{pmatrix}
+u \\
+y &= 
+\begin{pmatrix}
+    b_1 & b_2 & \cdots & b_n
+\end{pmatrix}
+z + du
+\end{aligned}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Reachable Canonical Form}
+The characteristic polynomial for the system is given by: 
+\begin{equation}
+    \lambda (s) = s^n + a_1 s^{n-1} + \cdots + a_{n-1} s + a_n
+\end{equation}
+The reachability matrix is: 
+\begin{equation}
+    \tilde{W}_r = 
+    \begin{pmatrix}
+        \tilde{B} & \tilde{A}\tilde{B} & \cdots & \tilde{A}^{n-1} \tilde{B}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+1 & -a_1 & a_1^2 - a_2 & \cdots & * \\
+0 & 1 & -a_1 & \cdots & * \\
+0 & 0 & \ddots & \ddots & \vdots \\
+\vdots & & \ddots & 1 & -a_1 \\
+0 & \cdots & \cdots & 0 & 1
+\end{pmatrix}
+\end{equation}
+
+\begin{equation}
+    \tilde{A} = TAT^{-1}, \tilde{B} = TB
+\end{equation}
+And the transformation is: 
+\begin{equation}
+    T = \tilde{W}_r W_r^{-1}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stabilisation by State Feedback}
+We consider a linear control law:
+\begin{equation}
+    u = -Kx + k_f r
+\end{equation}
+Substituting into the system: 
+\begin{equation}
+    \frac{dx}{dt} = (A - BK)x + B k_f r
+\end{equation}
+We want to determine the feedback gain K, so that the closed loop system has the characteristic polynomial: 
+\begin{equation}
+    p(s) = s^n + p_1 s^{n-1} + \cdots + p_{n-1} s + p_n
+\end{equation}
+The stability of the system is governed by the eigenvalues of $A-BK$, ie the solutions to $p(s)$.
+The equilibrium point and steady-state output for the closed loop system are given by: 
+\begin{equation}
+\begin{aligned}
+    x_e &= -(A-BK)^{-1} Bk_f r \\
+    y_e &= Cx_e + Du_e
+\end{aligned}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Design}
+If D = 0:
+\begin{equation}
+    k_f = \frac{-1}{C(A-BK)^{-1}B}
+\end{equation}
+Using our gains K and $k_f$, we find the eigenvalues needed to design the \textsl{dynamics} of our closed loop system to satisfy our goal. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Eigenvalue Assignment}
+Our system is: 
+\begin{equation}
+\begin{aligned}
+    \dot{x} &= Ax + Bu, \qquad y &= Cx + Du
+\end{aligned}
+\end{equation}
+We assume our system is reachable/controllable.
+We change the coordinates by a transformation $z=Tx$, so that our system is in the reachable canonical form. 
+\begin{equation}
+    \dot{z} = \tilde{A} z + \tilde{B} u
+\end{equation}
+Our controller is given by: 
+\begin{equation}
+\begin{aligned}
+    u &= - \tilde{K}z + k_f r = - \tilde{K} Tx + k_f r \\
+      &= -\tilde{k_1} z_1 - \tilde{k_2} z_2 - \cdots - \tilde{k_n} z_n + k_f r
+\end{aligned}
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{More}
+The closed loop system then becomes: 
+\begin{equation}
+\begin{aligned}
+\frac{dz}{dt}
+&=
+\begin{pmatrix}
+-a_1 - \tilde{k_1} & -a_2- \tilde{k_2} & -a_3 - \tilde{k_3} & \cdots & -a_n  - k_n \\
+1 & 0 & 0 & \cdots & 0 \\
+0 & 1 & 0 & \cdots & 0 \\
+\vdots & & \ddots & \ddots & \vdots \\
+0 & 0 & \cdots & 1 & 0
+\end{pmatrix}
+z
++
+\begin{pmatrix}
+k_f \\ 0 \\ 0 \\ \vdots \\ 0
+\end{pmatrix}
+r \\
+\end{aligned}
+\end{equation}
+
+The characteristic polynomial is then: 
+\begin{equation}
+    s^n + (a_1 + \tilde{k_1})s^{n-1} + \cdots + (a_{n-1} + \tilde{k}_{n-1})s + a_n + \tilde{k}_n
+\end{equation}
+Equating coefficients with 
+the chose closed-loop polynomial we have: 
+
+\begin{equation}
+    \tilde{k}_i = p_i - a_i
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{The feedback gain}
+In reachable canonical form:
+\begin{equation}
+    \tilde{K} = 
+    \begin{pmatrix}
+        p_1 - a_1 & p_2 - a_2 & \cdots & p_n - a_n
+    \end{pmatrix}
+\end{equation}
+Thus overall, transforming back to its original: 
+\begin{equation}
+    K = \tilde{K}T = 
+    \begin{pmatrix}
+        p_1 - a_1 & p_2 - a_2 & \cdots & p_n - a_n
+    \end{pmatrix} 
+    \tilde{W}_r W_r^{-1}
+\end{equation}
+The feedforward gain is given by: 
+\begin{equation}
+    k_f = \frac{-1}{C(A-BK)^{-1}B}
+\end{equation}
+The method requires us to understand the dynamics of our desired system 
+and to relate it to the corresponding characteristic polynomial for it. 
+\end{frame}
+
+
+
+\end{document}

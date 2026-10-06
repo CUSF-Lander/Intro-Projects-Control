@@ -1,0 +1,114 @@
+\documentclass{beamer}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+% \theoremstyle{definition}
+% \newtheorem{definition}{Definition}
+
+% \theoremstyle{plain}
+% \newtheorem{theorem}{Theorem}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\title{Week 5 CUSF State Feedback 2: Linear Quadratic Regulators and }
+\author{Yoonjae Hwang}
+\date{9 November 2025}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Optimal Control}
+As we design our controllers, often we are concerned with how to make the \textsl{best} controller for our given system. 
+The 'best' control system is dependent on performance metrics we choose, which will be a case by case basis. 
+We have to relate a qualitative performance metric to quantitative values. 
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Performance vs Effort}
+To find a best control parameters, we can define a cost function then solve an optimisation problem to find our parameters that minimises those values. 
+To build our cost function, we want it to penalise: 
+\begin{itemize}
+    \item Low performance
+    \item High effort (money, energy, etc)
+\end{itemize} 
+We want this cost function to be minimised across the entire time in whcih the system operates. 
+We also want to be able to weigh these quantities differently, as different scenarios will require different biases. 
+\end{frame}
+
+\begin{frame}
+\frametitle{The Cost Function}
+
+\begin{equation}
+    J = \int_{0}^{\infty} x^{\top} Q x + u^{\top} R u \space dt
+\end{equation}
+
+\begin{itemize}
+    \item Q and R have to be positive definite matrices. 
+    \item The cost function is quadratic - it's convex and has a definite minimum. 
+    \item If x and u define a linear system, then the cost function remains quadratic. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solving the Linear Quadratic Problem}
+I won't go into the derivation. 
+The end result is: 
+\begin{equation}
+    u = -K x, \qquad K = R^{-1} B^{\top} S
+\end{equation}
+where $R, B$ statisfies the \textsl{Algebraic Riccati Equation}
+\begin{equation}
+    SA + A^{\top} S - S B R^{-1} B^{\top} S + Q = 0
+\end{equation}
+Remarks: 
+\begin{itemize}
+    \item Non trivial because it is quadratic in S
+    \item single positive-definite solution if and only if the system is stabilizable
+    \item You solve the equation numerically. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Integral Action}
+State feedback for 2nd order systems are essentially PD controllers - the position variables and their time derivatives are used. 
+\newline
+To carry out integral control, we must \textsl{augment} the system. We introduce a new term $z = \int_{0}^{t} y(\tau) - r(\tau) d\tau$.
+\begin{equation}
+    \frac{d}{dt}
+    \begin{bmatrix}
+        x \\
+        z
+    \end{bmatrix}
+    = 
+    \begin{bmatrix}
+        Ax + Bu \\
+        y - r
+    \end{bmatrix}
+\end{equation}
+The control law is then given by: 
+\begin{equation}
+    u = - Kx - k_i z + k_f r
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Reachability for Augmented Systems}
+The reachability matrix is then given by: 
+\begin{equation}
+    W_r = 
+    \begin{bmatrix}
+        B & AB & \cdots & A^n B \\
+        0 & CB & \dots & CA^{n-1}B 
+    \end{bmatrix}
+\end{equation}
+If $W_r$ is full rank we say that the system is controllable.
+\end{frame}
+
+
+
+\end{document}
